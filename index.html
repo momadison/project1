@@ -14,6 +14,7 @@
     <div id="wrapper">
         <div class="row">
             <div class="col-6">
+                <div class="playerWrapper">
         <p>
             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                 Join Game
@@ -24,23 +25,20 @@
                       <!--SIGN IN-->
                       <form>
                             <div class="form-group">
-                              <label for="formGroupExampleInput">First Name</label>
+                              <label for="formGroupExampleInput">Name</label>
                               <input type="text" class="form-control" id="firstName">
-                            </div>
-                            <div class="form-group">
-                              <label for="formGroupExampleInput2">Email</label>
-                              <input type="email" class="form-control" id="email">
                             </div>
                             <button type="submit" class="btn btn-primary ready">Ready</button>
                           </form>
                 </div>
             </div>
             </div>
-            <div class="col-6">
+            </div>
+            <div class="col-6" id="opponentWindow">
                     <div class="card" style="width: 18rem;">
-                            <img src="..." class="card-img-top imageLoading" alt="...">
+                            <img src="" class="card-img-top imageLoading" alt="">
                             <div class="card-body opponentWindow">
-                              <p class="card-text">Waiting for Opponent</p>
+                              <p class="card-text queueDisplay"></p>
                             </div>
                           </div>
             </div>
@@ -56,7 +54,7 @@
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
-            <div class="modal-body timer"> 
+            <div class="modal-body timer myInput"> 
                 <h1>READY</h1>
             </div>
           </div>

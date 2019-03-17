@@ -1,5 +1,6 @@
 body {
     background-image: url("../images/backGround3.jpg");
+    width: 100%;
 }
 
 .timer {
@@ -11,6 +12,37 @@ body {
     text-align: center;
     color: #fff;
     font-weight: bold;
+}
+
+.fightDisplay {
+    background: black;
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    height: 50px;
+}
+
+.cardChoice {
+    height: 200px;
+    border: .5px solid white;
+}
+
+.cardChoice:hover {
+    border: 5px solid #f1c40f;
+}
+
+.optionRow {
+    margin-top: 150px;
+}
+
+.leftHand {
+    margin-top: 150px;
+    width: 100%;
+}
+
+.rightHand {
+    margin-top: 150px;
+    width: 100%;
 }
 
 #wrapper {
