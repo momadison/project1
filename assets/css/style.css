@@ -37,12 +37,32 @@ body {
 
 .leftHand {
     margin-top: 150px;
-    width: 100%;
+    width: 75%;
+    -moz-box-shadow:    3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow:         3px 3px 5px 6px #ccc;
 }
 
 .rightHand {
     margin-top: 150px;
-    width: 100%;
+    width: 75%;
+    -moz-box-shadow:    3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow:         3px 3px 5px 6px #ccc;
+}
+
+.jumbotron {
+    text-align: center;
+    background: rgba(0,0,0,0.0);
+    text-shadow: 0 0 8px white, 0 0 8px black;
+    color: black;
+    font-weight: bold;
+    font-family: 'Exo 2', sans-serif;
+    font-family: 'Heebo', sans-serif;
+    font-family: 'ZCOOL XiaoWei', serif;
+    /* font-family: 'Source Code Pro', monospace; */
+    margin: 0px;
+    padding: 0px;
 }
 
 #wrapper {

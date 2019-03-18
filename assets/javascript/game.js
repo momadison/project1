@@ -13,15 +13,14 @@ var config = {
 var database = firebase.database();
 
 //Define initial variable to hold values
-var player1 = "";
-var player2 = "";
-var thisPlayer = "";
-var player1Choice = [0,0,0];
-var player2Choice = [0,0,0];
-var player1Q = false;
-var player2Q = false;
-var gameTime = false;
-var player1ID = "";
+var player = "";
+var playerChoice = "";
+var opponentChoice = "";
+var playerKey = "";
+var opponentKey = "";
+var stageSet = false;
+var intervalID = "";
+var result = "";
 
 //========================USEFUL FUNCTIONS================================
 //function to set the rock paper scissors stage
@@ -31,14 +30,14 @@ function setStage(append, title) {
     let cardRock = $("<div>");
     cardRock.addClass("card cardChoice");
     cardRock.attr("style","width: 100%;");
-    cardRock.attr("data-value", title.toLowerCase());
+    cardRock.attr("data-value", title);
     let cardImage = $("<img>");
     cardImage.addClass("card-img-top "+title+"Image");
     let cardBody = $("<div>");
     cardBody.addClass("card-body fightDisplay")
     cardBody.data("value", title);
     let cardText = $("<p>");
-    cardText.addClass("card-text queueDisplay");
+    cardText.addClass("card-text buttonDisplay");
     cardText.text(title.toUpperCase());
 
     cardBody.append(cardText);
@@ -49,6 +48,11 @@ function setStage(append, title) {
     $(append).append(colRock);
     //add giffy to the card image
     getGif(title, "."+title+"Image", 2);
+}
+
+//function to change the headlines
+function headlines(stringy) {
+    $(".display-4").text(stringy);
 }
 
 //===============================CONNECTED USERS COUNT AND TRACKER===========================================
@@ -66,6 +70,7 @@ connectedRef.on("value", function(snap) {
   
       // Add user to the connections list.
       var con = connectionsRef.push(true);
+      playerKey = con.getKey();
   
       // Remove user from the connection list when they disconnect.
       con.onDisconnect().remove();
@@ -78,79 +83,126 @@ connectedRef.on("value", function(snap) {
         // The number of online users is the number of children in the connections list.
         var opponentCount = parseInt(snapshot.numChildren()) - 1;
         // Display the viewer count in the html.
-        $(".queueDisplay").html("Opponents Ready<br>"+opponentCount);
+        $(".queueDisplay").html("Opponents Online<br>"+opponentCount);
       });
 
 //===========WHEN THE DATABASE CHANGES===============================
+//Get Unique Key of Both Users
 database.ref().on("value", function(snap) {
-    connection = snap.val().connections;
-    if ((snap.child("player1").exists()) && (!snap.child("player2").exists())) {
-        player1Q = true;
+
+    let connectorRef = snap.child('connections').val();
+    let connectorRefArray = Object.keys(connectorRef);
+    for (let key of connectorRefArray) {
+        if (key === playerKey) {
+            // console.log("this is my key: ", key);
+        }
+        else {
+            // console.log("this is the other players key: ", key);
+            opponentKey = key;
+        }
     }
-    //When both players are ready
-    else if ((snap.child("player1").exists())  && (snap.child("player2").exists()) && (gameTime === false)) {
-        player2Q = true;
-        if (player2 === snap.child("player2")) {thisPlayer = player2;}
-        player1 = snap.child("player1");
-        player2 = snap.child("player2");
+    
+    //check to see if both players have logged in
+    let opponentNameStatus = snap.child('connections/'+opponentKey+'/name').exists();
+    let playerNameStatus = snap.child('connections/'+playerKey+'/name').exists();
+
+    //check to see if both players have chosen their weapon
+    let opponentInputStatus = snap.child('connections/'+opponentKey+'/userInput').exists();
+    let playerInputStatus = snap.child('connections/'+playerKey+'/userInput').exists();
+    
+    //if player is ready and opponent is not
+    if ((playerNameStatus) && (!opponentNameStatus)) {
+    headlines("Waiting on Opponent");
+    }
+
+    //when both players are ready and if the buttons have never been set
+    if ( (opponentNameStatus) && (playerNameStatus) && (stageSet === false) ) {
+        //change headlines
+        headlines("Choose Your Weapon");
+        //make sure this only runs once after both players have signed in
+        stageSet = true;
         //empty wrapper
         $("#wrapper").empty();
-
-        //Add the rock paper scissors option
+        //Add the rock paper scissors buttons
         let newRow = $("<div>");
         newRow.addClass("row optionRow");
         $("#wrapper").append(newRow);
         setStage(".optionRow", "Rock");
         setStage(".optionRow", "Paper");
         setStage(".optionRow", "Scissors");
+        }
 
-        //============WHEN THE USER CLICKS THEIR ATTACK=================
-        $(".cardChoice").on("click", function() {
-            $("#wrapper").empty();
-            //append Divs for hand images for showdown
-            $("#wrapper").append("<div class='row'><div class='col-6'><img class='leftHand' /></div><div class='col-6'><img class='rightHand'></div>");
-            //add hand images to stage
-            $(".leftHand").attr("src", "assets/images/leftRock.jpg");
-            $(".rightHand").attr("src", "assets/images/rightRock.jpg");
-            //record userChoice into database
-            databaseReference = database.ref("player1/"+player1ID);
-            databaseReference.update({
-                userInput: "Rock"
-            })
-            //rock paper scissors shoot
+        //if player has chosen weapon and waiting on opponent
+        if ((playerInputStatus) && (!opponentInputStatus)) {
+            headlines("Waiting On Opponent");
+        }
+
+        if ((playerInputStatus) && (opponentInputStatus)) {
+            //Get Opponents Choice and do logic for winner
+            opponentChoice = snap.child('connections/'+opponentKey+'/userInput').val();
+            headlines("Fight");
+
+            if (playerChoice === opponentChoice) {
+                result = "Tie";
+            }
+            
+            if (playerChoice === 'Rock') {
+                if (opponentChoice === 'Paper') {
+                    result = "Lose";
+                }
+                else if (opponentChoice === 'Scissors') {
+                    result = "Win";
+                }
+            }
+            if (playerChoice === 'Paper') {
+                if (opponentChoice === 'Scissors') {
+                    result = "Lose";
+                }
+                else if (opponentChoice === 'Rock') {
+                    result = "Win";
+                }
+            }
+            if (playerChoice === 'Scissors') {
+                if (opponentChoice === 'Rock') {
+                    result = "Lose";
+                }
+                else if (opponentChoice === 'Paper') {
+                    result = "Win";
+                }
+            }
+            
+
+            //add modal
             $('#myModal').modal({show: true});
             $('#myModal').on('shown.bs.modal', function () {
             $('#myInput').trigger('focus')
             })
-            var intervalID = setInterval(countDown, 1000);
+            intervalID = setInterval(countDown, 1000);
+        }
+        
+        //============WHEN THE USER CLICKS THEIR ATTACK=================
+        $(".cardChoice").on("click", function() {
+            //record userChoice into database
+            
+                playerChoice = $(this).data("value");
+                database.ref('connections/'+playerKey).update({
+                userInput: playerChoice
+                })
+                $("#wrapper").empty();
+            
         })
-    }
 })
 
 //====================CLICK JOIN GAME BUTTON==================================
 $(".ready").on("click", function() {
     event.preventDefault();
-    //if player1 is not selected
-    if (player1Q === false) {
+    $('.alert').alert('close');
         //get information from user
-        player1 = $("#firstName").val().trim();
-        //set player1 to user information
-        var newRef1 = database.ref('/player1').push({
-        name: player1,
-        userInput: ""
+        player = $("#firstName").val().trim();
+        //set player to user information
+        database.ref("connections/"+playerKey).update({
+        name: player
         })
-        player1ID = newRef1.key;
-    }
-    //if player 1 is selected but not player 2
-    else if (player2Q === false) {
-        player2 = $("#firstName").val().trim();
-        player2Q = true;
-        var newRef2 = database.ref('/player2').push({
-            name: player2,
-            userInput: ""
-        })
-        var player2ID = newRef2.key;
-    }
     $(".playerWrapper").remove();
 })
 
@@ -160,22 +212,41 @@ $(".ready").on("click", function() {
 var countClock = 0;
     function countDown() {
         switch(countClock) {
-            case 0: $(".timer").html("<h1>ROCK</h1>");
+            case 0: 
+            $(".timer").html("<h1>ROCK</h1>");
+            //append Divs for hand images for showdown
+            $("#wrapper").append("<div class='row'><div class='col-6'><img class='leftHand' /></div><div class='col-6'><img class='rightHand'></div>");
+            //add hand images to stage
+            $(".leftHand").attr("src", "assets/images/leftRock.jpg");
+            $(".rightHand").attr("src", "assets/images/rightRock.jpg");
             countClock++;
             break;
-            case 1: $(".timer").html("<h1>PAPER</h1>");
+            case 1: 
+            $(".timer").html("<h1>PAPER</h1>");
+            $(".leftHand").attr("src", "assets/images/leftPaper.jpg");
+            $(".rightHand").attr("src", "assets/images/rightPaper.jpg");
             countClock++;
             break;
-            case 2: $(".timer").html("<h1>SCISSORS</h1>");
+            case 2: 
+            $(".timer").html("<h1>SCISSORS</h1>");
+            $(".leftHand").attr("src", "assets/images/leftScissors.jpg");
+            $(".rightHand").attr("src", "assets/images/rightScissors.jpg");
             countClock++;
             break;
-            case 3: $(".timer").html("<h1>SHOOT</h1>");
+            case 3: 
+            $(".timer").html("<h1>SHOOT</h1>");
             countClock++;
             break;
-            case 4: $("#myModal").modal('hide');
-            // location.reload();
+            case 4: 
+            $("#myModal").modal('hide');
+            $(".leftHand").attr("src", "assets/images/left"+playerChoice+".jpg");
+            $(".rightHand").attr("src", "assets/images/right"+opponentChoice+".jpg");
+            countClock++;
+            break;
+            case 5:
+            headlines("You "+result);
             countClock = 0;
-            break;
+            clearInterval(intervalID);
         }
     }
 
@@ -196,5 +267,6 @@ var countClock = 0;
 }
 
 getGif("loading", ".imageLoading", 1);
+
 
 
