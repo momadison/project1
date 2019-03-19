@@ -13,7 +13,6 @@ var config = {
 var database = firebase.database();
 
 //Define initial variable to hold values
-var player = "";
 var playerChoice = "";
 var opponentChoice = "";
 var playerKey = "";
@@ -21,15 +20,27 @@ var opponentKey = "";
 var stageSet = false;
 var intervalID = "";
 var result = "";
+var playerName = "";
+var opponentName = "";
+var wins = 0;
+var loss = 0;
+var champion = false;
+var playerInputStatus = "";
+var opponentInputStatus = "";
+var twoThreeAudio = new Audio('assets/images/twoThree.mov');
+var finalRoundAudio = new Audio('assets/images/finalRound.mov');
+
 
 //========================USEFUL FUNCTIONS================================
+//function to set the users info on the page
+
+
 //function to set the rock paper scissors stage
 function setStage(append, title) {
     let colRock = $("<div>");
     colRock.addClass("col-4 "+title+"Col");
     let cardRock = $("<div>");
     cardRock.addClass("card cardChoice");
-    cardRock.attr("style","width: 100%;");
     cardRock.attr("data-value", title);
     let cardImage = $("<img>");
     cardImage.addClass("card-img-top "+title+"Image");
@@ -48,6 +59,24 @@ function setStage(append, title) {
     $(append).append(colRock);
     //add giffy to the card image
     getGif(title, "."+title+"Image", 2);
+    // $('.'+title+'Image').attr('src', 'assets/images/rock.jpg');
+}
+
+//function to set the player cards to stage
+function setPlayerCard(append, name, divNames) {
+    let newCol = $('<div>');
+    newCol.addClass('col-6');
+    let newButton = $('<button>');
+    newButton.attr('type', 'button');
+    newButton.addClass('btn btn-primary '+divNames+'Button');
+    newButton.html(name+'\'s Wins<br>');
+    let newSpan = $('<span>');
+    newSpan.addClass('badge badge-light '+divNames+'Badge');
+    newSpan.text(wins);
+
+    newButton.append(newSpan);
+    newCol.append(newButton);
+    $(append).append(newCol);
 }
 
 //function to change the headlines
@@ -86,10 +115,11 @@ connectedRef.on("value", function(snap) {
         $(".queueDisplay").html("Opponents Online<br>"+opponentCount);
       });
 
-//===========WHEN THE DATABASE CHANGES===============================
-//Get Unique Key of Both Users
-database.ref().on("value", function(snap) {
+//===========WHEN THE DATABASE CHANGES==================================================================
 
+database.ref().on("value", function(snap) {
+    console.log('RECEIVING THE CLEARED OPPONENT MESSAGE');
+    //Get Unique Key of Both Users
     let connectorRef = snap.child('connections').val();
     let connectorRefArray = Object.keys(connectorRef);
     for (let key of connectorRefArray) {
@@ -102,21 +132,31 @@ database.ref().on("value", function(snap) {
         }
     }
     
-    //check to see if both players have logged in
-    let opponentNameStatus = snap.child('connections/'+opponentKey+'/name').exists();
-    let playerNameStatus = snap.child('connections/'+playerKey+'/name').exists();
+    //Reference to user Name
+    let opponentNameStatus = snap.child('connections/'+opponentKey+'/name');
+    let playerNameStatus = snap.child('connections/'+playerKey+'/name');
 
-    //check to see if both players have chosen their weapon
-    let opponentInputStatus = snap.child('connections/'+opponentKey+'/userInput').exists();
-    let playerInputStatus = snap.child('connections/'+playerKey+'/userInput').exists();
+    //Reference to user Input
+    opponentInputStatus = snap.child('connections/'+opponentKey+'/userInput');
+    playerInputStatus = snap.child('connections/'+playerKey+'/userInput');
+
     
     //if player is ready and opponent is not
-    if ((playerNameStatus) && (!opponentNameStatus)) {
+    if ((playerNameStatus.exists()) && (!opponentNameStatus.exists())) {
     headlines("Waiting on Opponent");
     }
 
     //when both players are ready and if the buttons have never been set
-    if ( (opponentNameStatus) && (playerNameStatus) && (stageSet === false) ) {
+    if ( (snap.child('connections/'+opponentKey+'/name').exists()) && (snap.child('connections/'+playerKey+'/name').exists()) && (stageSet === false) ) {
+        //Get opponents Name
+        opponentName = snap.child('connections/'+opponentKey+'/name').val();
+        //set player cards to the stage
+        let cardRow = $('<div>');
+        cardRow.addClass('row cardRow');
+        $('.wrapper').append(cardRow);
+        setPlayerCard('.cardRow', playerName, "player");
+        setPlayerCard('.cardRow', opponentName, "opponent");
+
         //change headlines
         headlines("Choose Your Weapon");
         //make sure this only runs once after both players have signed in
@@ -133,15 +173,16 @@ database.ref().on("value", function(snap) {
         }
 
         //if player has chosen weapon and waiting on opponent
-        if ((playerInputStatus) && (!opponentInputStatus)) {
-            headlines("Waiting On Opponent");
+        if ((snap.child('connections/'+opponentKey+'/userInput').exists()) && (!snap.child('connections/'+opponentKey+'/userInput').exists())) {
+            headlines("Waiting On "+opponentName);
         }
 
-        if ((playerInputStatus) && (opponentInputStatus)) {
+        if ((snap.child('connections/'+playerKey+'/userInput').exists()) && (snap.child('connections/'+opponentKey+'/userInput').exists())) {
             //Get Opponents Choice and do logic for winner
             opponentChoice = snap.child('connections/'+opponentKey+'/userInput').val();
             headlines("Fight");
 
+            //Logic for Rock Paper Scissors Game and add up win and loss count
             if (playerChoice === opponentChoice) {
                 result = "Tie";
             }
@@ -149,30 +190,36 @@ database.ref().on("value", function(snap) {
             if (playerChoice === 'Rock') {
                 if (opponentChoice === 'Paper') {
                     result = "Lose";
+                    loss++;
                 }
                 else if (opponentChoice === 'Scissors') {
                     result = "Win";
+                    wins++;
                 }
             }
             if (playerChoice === 'Paper') {
                 if (opponentChoice === 'Scissors') {
                     result = "Lose";
+                    loss++
                 }
                 else if (opponentChoice === 'Rock') {
                     result = "Win";
+                    wins++;
                 }
             }
             if (playerChoice === 'Scissors') {
                 if (opponentChoice === 'Rock') {
                     result = "Lose";
+                    loss++;
                 }
                 else if (opponentChoice === 'Paper') {
                     result = "Win";
+                    wins++;
                 }
             }
             
 
-            //add modal
+            //add modal for countdown
             $('#myModal').modal({show: true});
             $('#myModal').on('shown.bs.modal', function () {
             $('#myInput').trigger('focus')
@@ -196,19 +243,21 @@ database.ref().on("value", function(snap) {
 //====================CLICK JOIN GAME BUTTON==================================
 $(".ready").on("click", function() {
     event.preventDefault();
-    $('.alert').alert('close');
         //get information from user
-        player = $("#firstName").val().trim();
+        playerName = $("#firstName").val().trim();
+        console.log('PLAYER NAME: ', playerName);
         //set player to user information
         database.ref("connections/"+playerKey).update({
-        name: player
-        })
+        name: playerName
+        }, function(errorObject) {
+            console.log("The read failed: " + errorObject.code);
+          });
     $(".playerWrapper").remove();
 })
 
 
 
-//count clock for function countdown for rock paper scissors shoot animation
+//count clock for function countdown for rock paper scissors shoot animation and runs end game on Case 6 if 3 games have been played
 var countClock = 0;
     function countDown() {
         switch(countClock) {
@@ -244,9 +293,51 @@ var countClock = 0;
             countClock++;
             break;
             case 5:
+            countClock++;
             headlines("You "+result);
-            countClock = 0;
+            $(".timer").html("<h1>READY</h1>");
+            break;
+            case 6:
+            //This is the end
+            countClock++;
+            totalGame = wins + loss;
+            if (totalGame === 1) {twoThreeAudio.play()}
+            if ((loss === wins) && (loss != 0)) {finalRoundAudio.play()}
+            if ((wins === 2) || (loss === 2)) {
+                $('#wrapper').empty();
+                clearInterval(intervalID);
+                countClock=0;
+                $('#restartGame').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                })
+                $('#restartGame').modal({show: true});
+                
+                //When Rematch Button is hit
+                $('.rematch').on("click", function() {
+                    loss = 0;
+                    wins = 0;
+                    countClock = 8;
+                    countDown();
+                })
+
+                //When Quit Game is hit
+                $('.quitGame').on("click", function() {
+                    location.reload();
+                })
+            }
+            break;
+            case 7: 
+            countClock++;
+            break;
+            case 8:
+            //empty wrapper
+            $("#wrapper").empty();
+            countClock=0;
             clearInterval(intervalID);
+            stageSet = false;
+            database.ref('connections/'+playerKey+'/userInput').remove();
+            break;
         }
     }
 

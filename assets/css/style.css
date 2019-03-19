@@ -25,6 +25,9 @@ body {
 .cardChoice {
     height: 200px;
     border: .5px solid white;
+    -moz-box-shadow:    3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow:         3px 3px 5px 6px #ccc;
 }
 
 .cardChoice:hover {
@@ -64,6 +67,17 @@ body {
     margin: 0px;
     padding: 0px;
 }
+
+.playerButton {
+    margin-top: 100px;
+}
+
+.opponentButton {
+    margin-top: 100px;
+    margin-left: auto;
+    float: right;
+}
+
 
 #wrapper {
     margin-top: 20px;

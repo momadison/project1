@@ -55,7 +55,7 @@
 
 <!--MODAL MODAL MODAL MODAL MODAL MODAL MODAL MODAL MODAL MODAL-->
       
-      <!-- Modal -->
+      <!-- Modal for Countdown-->
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -65,6 +65,21 @@
           </div>
         </div>
       </div>
+
+      <!--Modal for Rematch-->
+      <div class="modal" tabindex="-1" role="dialog" id="restartGame">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header mx-auto">
+                  <h5 class="modal-title px-auto">Game Over</h5>
+                </div>
+                <div class="modal-footer mx-auto">
+                  <button type="button" class="btn btn-primary rematch" data-dismiss="modal">Rematch</button>
+                  <button type="button" class="btn btn-primary quitGame">Quit Game</button>
+                </div>
+              </div>
+            </div>
+          </div>
 
     <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
