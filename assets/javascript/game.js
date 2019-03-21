@@ -30,6 +30,7 @@ var playerInputStatus = "";
 var opponentInputStatus = "";
 var twoThreeAudio = new Audio('assets/images/twoThree.mov');
 var finalRoundAudio = new Audio('assets/images/finalRound.mov');
+var championAudio = new Audio('assets/images/champion.mov');
 
 
 //========================USEFUL FUNCTIONS================================
@@ -311,6 +312,9 @@ var countClock = 0;
             if (totalGame === 1) {twoThreeAudio.play()}
             if ((loss === wins) && (loss != 0)) {finalRoundAudio.play()}
             if ((wins === 2) || (loss === 2)) {
+                if (wins === 2) {
+                championAudio.play();
+                }
                 $('#wrapper').empty();
                 clearInterval(intervalID);
                 countClock=0;
@@ -323,6 +327,7 @@ var countClock = 0;
                 //When Rematch Button is hit
                 $('.rematch').on("click", function() {
                     event.preventDefault();
+                    database.ref('messages').remove();
                     loss = 0;
                     wins = 0;
                     countClock = 8;
@@ -331,6 +336,7 @@ var countClock = 0;
 
                 //When Quit Game is hit
                 $('.quitGame').on("click", function() {
+                    event.preventDefault();
                     database.ref('messages').remove();
                     location.reload();
                 })
