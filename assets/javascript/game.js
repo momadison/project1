@@ -327,7 +327,6 @@ var countClock = 0;
                 //When Rematch Button is hit
                 $('.rematch').on("click", function() {
                     event.preventDefault();
-                    database.ref('messages').remove();
                     loss = 0;
                     wins = 0;
                     countClock = 8;
