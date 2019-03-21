@@ -24,6 +24,7 @@ var playerName = "";
 var opponentName = "";
 var wins = 0;
 var loss = 0;
+var totalGame = 0;
 var champion = false;
 var playerInputStatus = "";
 var opponentInputStatus = "";
@@ -32,7 +33,13 @@ var finalRoundAudio = new Audio('assets/images/finalRound.mov');
 
 
 //========================USEFUL FUNCTIONS================================
-//function to set the users info on the page
+function openForm() {
+    document.getElementById("myForm").style.display = "block";
+  }
+  
+  function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+  }
 
 
 //function to set the rock paper scissors stage
@@ -118,7 +125,6 @@ connectedRef.on("value", function(snap) {
 //===========WHEN THE DATABASE CHANGES==================================================================
 
 database.ref().on("value", function(snap) {
-    console.log('RECEIVING THE CLEARED OPPONENT MESSAGE');
     //Get Unique Key of Both Users
     let connectorRef = snap.child('connections').val();
     let connectorRefArray = Object.keys(connectorRef);
@@ -146,6 +152,7 @@ database.ref().on("value", function(snap) {
     headlines("Waiting on Opponent");
     }
 
+        
     //when both players are ready and if the buttons have never been set
     if ( (snap.child('connections/'+opponentKey+'/name').exists()) && (snap.child('connections/'+playerKey+'/name').exists()) && (stageSet === false) ) {
         //Get opponents Name
@@ -154,6 +161,7 @@ database.ref().on("value", function(snap) {
         let cardRow = $('<div>');
         cardRow.addClass('row cardRow');
         $('.wrapper').append(cardRow);
+        $('.playerBoardCol').text('YOU\'VE WON '+wins+' OUT OF '+totalGame);
         setPlayerCard('.cardRow', playerName, "player");
         setPlayerCard('.cardRow', opponentName, "opponent");
 
@@ -173,7 +181,7 @@ database.ref().on("value", function(snap) {
         }
 
         //if player has chosen weapon and waiting on opponent
-        if ((snap.child('connections/'+opponentKey+'/userInput').exists()) && (!snap.child('connections/'+opponentKey+'/userInput').exists())) {
+        if ((snap.child('connections/'+playerKey+'/userInput').exists()) && (!snap.child('connections/'+opponentKey+'/userInput').exists())) {
             headlines("Waiting On "+opponentName);
         }
 
@@ -245,7 +253,6 @@ $(".ready").on("click", function() {
     event.preventDefault();
         //get information from user
         playerName = $("#firstName").val().trim();
-        console.log('PLAYER NAME: ', playerName);
         //set player to user information
         database.ref("connections/"+playerKey).update({
         name: playerName
@@ -315,6 +322,7 @@ var countClock = 0;
                 
                 //When Rematch Button is hit
                 $('.rematch').on("click", function() {
+                    event.preventDefault();
                     loss = 0;
                     wins = 0;
                     countClock = 8;
@@ -323,6 +331,7 @@ var countClock = 0;
 
                 //When Quit Game is hit
                 $('.quitGame').on("click", function() {
+                    database.ref('messages').remove();
                     location.reload();
                 })
             }
@@ -358,6 +367,25 @@ var countClock = 0;
 }
 
 getGif("loading", ".imageLoading", 1);
+
+//ADD MESSENGER LISTENER TO SEE IF THE USER FILLED OUT THE TRASH TALKING MODULE AND SUBMITTED THEIR FEELINGS
+$('.feelingsBtn').on("click", function() {
+    if (playerName !== "") {
+        event.preventDefault();
+        userMessage = $('#inputTrash').val().trim();
+
+        database.ref('/messages').push({
+            userMessage: playerName+': '+userMessage
+        })
+    }
+})
+
+database.ref('messages').on("child_added", function(snap) {
+    let messageKey = snap.child('userMessage').val();
+    var newLI = $('<li>');
+        newLI.text(messageKey);
+        $('.boxMessage').prepend(newLI);
+})
 
 
 

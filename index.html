@@ -80,6 +80,28 @@
               </div>
             </div>
           </div>
+     <div class='row messageBox'>
+       <div class='col-12 messageBoxCol'>
+       <ul class='boxMessage'></ul>
+       </div>
+     </div>
+    <footer>
+            <div class="row mx-auto">
+                <div class="col-6 playerBoardCol px-auto"></div>
+                <div class='col-6'>
+                    <button class="open-button" onclick="openForm()">Trash Talking Module</button>
+
+                    <div class="chat-popup" id="myForm">
+                      <form action="" class="form-container">
+                        <label for="msg"><b>Submit Feelings</b></label>
+                        <textarea placeholder="Type message.." name="msg" id='inputTrash' required></textarea>
+                        <button type="button" class="btn feelingsBtn">Send</button>
+                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                      </form>
+                    </div>
+                </div>
+            </div>
+    </footer>   
 
     <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
@@ -88,6 +110,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
     <script src="assets/javascript/game.js"></script>
+
+    
 
 </body>
 </html>

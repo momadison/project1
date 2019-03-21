@@ -1,3 +1,5 @@
+{box-sizing: border-box;}
+
 body {
     background-image: url("../images/backGround3.jpg");
     width: 100%;
@@ -54,6 +56,24 @@ body {
     box-shadow:         3px 3px 5px 6px #ccc;
 }
 
+.messageBox {
+    background: rgba(255, 255, 255, 0.8);
+    height: 150px;
+    margin-bottom: 40px;
+    position: fixed;
+    bottom: 0px;
+    border-top: 5px solid black;
+    border-left: 5px solid black;
+    border-right: 5px solid black;
+    width: 50%;
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 15px;
+    float: right;
+    margin-left: 50%;
+}
+
 .jumbotron {
     text-align: center;
     background: rgba(0,0,0,0.0);
@@ -101,3 +121,96 @@ body {
     z-index: 10; /* keep on top of other elements on the page */
     box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
 }
+
+footer {
+    margin-top: 40px;
+    position: fixed;
+    bottom: 0px;
+    border-top: 5px solid black;
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    background: #c3c3c3;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 50px;
+}
+
+
+
+
+/* Button used to open the chat form - fixed at the bottom of the page */
+.open-button {
+    background-color:black;
+    color: white;
+    border: none;
+    cursor: pointer;
+    opacity: 0.8;
+    width: 50%;
+    height: 30px;
+    font-weight: bold;
+    vertical-align: middle;
+    line-height: 14px;
+  }
+  
+  /* The popup chat - hidden by default */
+  .chat-popup {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 15px;
+    border: 3px solid #f1f1f1;
+    z-index: 9;
+  }
+  
+  /* Add styles to the form container */
+  .form-container {
+    max-width: 300px;
+    padding: 10px;
+    background-color: rgb(0,0,0,0.8);
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  /* Full-width textarea */
+  .form-container textarea {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #f1f1f1;
+    resize: none;
+    min-height: 200px;
+  }
+  
+  /* When the textarea gets focus, do something */
+  .form-container textarea:focus {
+    background-color: #ddd;
+    outline: none;
+  }
+  
+  /* Set a style for the submit/send button */
+  .form-container .btn {
+    background-color: #fff;;
+    color: black;
+    font-weight: bold;
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom:10px;
+    opacity: 0.8;
+  }
+  
+  /* Add a red background color to the cancel button */
+  .form-container .cancel {
+    background-color: black;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  /* Add some hover effects to buttons */
+  .form-container .btn:hover, .open-button:hover {
+    opacity: 1;
+  }
+
